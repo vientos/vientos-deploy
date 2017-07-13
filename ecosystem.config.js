@@ -2,13 +2,24 @@ const credentials = require('./credentials.json')
 
 const ENV = 'staging'
 
-const APP_NAME = 'vientos-app'
-const SERVICE_NAME = 'vientos-service'
-const IDP_NAME = 'vientos-idp'
+const APP = {
+  NAME: 'vientos-app',
+  DOMAIN: 'app.coop.example'
+}
+const SERVICE = {
+  NAME: 'vientos-service',
+  DOMAIN: 'data.coop.example',
+  PORT: 8000
+}
+const IDP = {
+  NAME: 'vientos-idp',
+  DOMAIN: 'idp.coop.example',
+  PORT: 8100
+}
 
-const APP_DOMAIN = 'app.coop.example'
-const SERVICE_DOMAIN = 'data.coop.example'
-const IDP_DOMAIN = 'idp.coop.example'
+const WEBHOOKS = {
+  PORT: 8200
+}
 
 function url (domain) {
   return `https://${domain}`
@@ -18,6 +29,10 @@ function dir (name) {
   return `./${name}`
 }
 
+function mongo (name) {
+  return `${credentials.mongo}${ENV}${name.replace('vientos', '')}`
+}
+
 module.exports = {
   apps: [
     {
@@ -25,14 +40,15 @@ module.exports = {
       script: './vientos-service/src/server.js',
       env: {
         NODE_ENV: ENV,
-        HAPI_PORT: 8000,
+        // TODO: change to PORT: SERVICE.PORT
+        HAPI_PORT: SERVICE.PORT,
         // TODO: change to SERVICE_URL: url(SERVICE_DOMAIN),
-        OAUTH_CLIENT_DOMAIN: url(SERVICE_DOMAIN),
+        OAUTH_CLIENT_DOMAIN: url(SERVICE.DOMAIN),
         // TODO: change to APP_URL: url(APP_DOMAIN),
-        PWA_URL: url(APP_DOMAIN),
-        MONGO_URL: credentials.mongo + SERVICE_NAME,
+        PWA_URL: url(APP.DOMAIN),
+        MONGO_URL: mongo(SERVICE.NAME),
         COOKIE_PASSWORD: credentials.cookie.service,
-        VIENTOS_IDP_URL: url(IDP_DOMAIN),
+        VIENTOS_IDP_URL: url(IDP.DOMAIN),
         GCM_API_KEY: credentials.google.gcmApiKey,
         VIENTOS_CLIENT_ID: credentials.vientos.clientId,
         VIENTOS_CIIENT_SECRET: credentials.vientos.clientSecret,
@@ -48,11 +64,11 @@ module.exports = {
       script: './vientos-idp/src/server.js',
       env: {
         NODE_ENV: ENV,
-        PORT: 8100,
-        MONGO_URL: credentials.mongo + IDP_NAME,
+        PORT: IDP.PORT,
+        MONGO_URL: mongo(IDP.NAME),
         COOKIE_PASSWORD: credentials.cookie.idp,
-        VIENTOS_IDP_URL: url(IDP_DOMAIN),
-        OAUTH_CLIENT_REDIRECT_PATH: url(SERVICE_DOMAIN) + '/auth/vientos',
+        VIENTOS_IDP_URL: url(IDP.DOMAIN),
+        OAUTH_CLIENT_REDIRECT_PATH: url(SERVICE.DOMAIN) + '/auth/vientos',
         VIENTOS_CLIENT_ID: credentials.vientos.clientId,
         VIENTOS_CIIENT_SECRET: credentials.vientos.clientSecret,
         FROM_EMAIL: credentials.vientos.fromEmail,
@@ -66,11 +82,11 @@ module.exports = {
       script: './vientos-deploy/webhooks.js',
       env: {
         GIT_REF: ENV,
-        PORT: 8200,
+        PORT: WEBHOOKS.PORT,
         WEBHOOKS_SECRET: credentials.github.webhooksSecret,
-        APP_DIR: dir(APP_NAME),
-        SERVICE_DIR: dir(SERVICE_NAME),
-        IDP_DIR: dir(IDP_NAME)
+        APP_DIR: dir(APP.NAME),
+        SERVICE_DIR: dir(SERVICE.NAME),
+        IDP_DIR: dir(IDP.NAME)
       }
     }
   ]

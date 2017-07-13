@@ -1,4 +1,4 @@
 cd $IDP_DIR
-git pull
-npm i
+git pull --rebase
+npm install
 pm2 restart idp

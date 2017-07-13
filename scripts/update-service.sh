@@ -1,4 +1,4 @@
 cd $SERVICE_DIR
-git pull
-npm i
+git pull --rebase
+npm install
 pm2 restart data
