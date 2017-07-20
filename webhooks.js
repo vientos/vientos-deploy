@@ -40,3 +40,12 @@ gh.on('push:vientos-service:' + GIT_REF, (data) => {
     console.log(stdout)
   })
 })
+
+gh.on('push:vientos-idp:' + GIT_REF, (data) => {
+  console.log('IDP')
+  execFile('scripts/update-idp.sh', execOptions, (err, stdout, stderr) => {
+    if (err) console.log(err)
+    if (stderr) console.log(stderr)
+    console.log(stdout)
+  })
+})
