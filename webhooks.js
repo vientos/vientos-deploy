@@ -15,6 +15,7 @@ if (process.env.TLS_KEY_PATH && process.env.TLS_CERT_PATH) {
 
 const gh = require('githubhook')(config)
 const GIT_REF = process.env.GIT_REF
+const SCRIPTS_PATH = process.env.SCRIPTS_PATH
 
 // Increase maxBuffer from 200*1024 to 1024*1024
 const execOptions = {
@@ -25,7 +26,7 @@ gh.listen()
 
 gh.on('push:vientos-app:' + GIT_REF, (data) => {
   console.log('APP')
-  execFile('scripts/update-app.sh', execOptions, (err, stdout, stderr) => {
+  execFile(`${SCRIPTS_PATH}/update-app.sh`, execOptions, (err, stdout, stderr) => {
     if (err) console.log(err)
     if (stderr) console.log(stderr)
     console.log(stdout)
@@ -34,7 +35,7 @@ gh.on('push:vientos-app:' + GIT_REF, (data) => {
 
 gh.on('push:vientos-service:' + GIT_REF, (data) => {
   console.log('SERVICE')
-  execFile('scripts/update-service.sh', execOptions, (err, stdout, stderr) => {
+  execFile(`${SCRIPTS_PATH}/update-service.sh`, execOptions, (err, stdout, stderr) => {
     if (err) console.log(err)
     if (stderr) console.log(stderr)
     console.log(stdout)
@@ -43,7 +44,7 @@ gh.on('push:vientos-service:' + GIT_REF, (data) => {
 
 gh.on('push:vientos-idp:' + GIT_REF, (data) => {
   console.log('IDP')
-  execFile('scripts/update-idp.sh', execOptions, (err, stdout, stderr) => {
+  execFile(`${SCRIPTS_PATH}/update-idp.sh`, execOptions, (err, stdout, stderr) => {
     if (err) console.log(err)
     if (stderr) console.log(stderr)
     console.log(stdout)

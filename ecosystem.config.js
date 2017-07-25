@@ -18,6 +18,7 @@ const IDP = {
 }
 
 const WEBHOOKS = {
+  NAME: 'vientos-deploy',
   PORT: 8200
 }
 
@@ -83,6 +84,7 @@ module.exports = {
       script: './vientos-deploy/webhooks.js',
       env: {
         GIT_REF: `refs/heads/${ENV}`,
+        SCRIPTS_PATH: dir(WEBHOOKS.NAME) + '/scripts',
         PORT: WEBHOOKS.PORT,
         WEBHOOKS_SECRET: credentials.github.webhooksSecret,
         APP_DIR: dir(APP.NAME),
