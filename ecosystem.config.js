@@ -26,7 +26,7 @@ function url (domain) {
 }
 
 function dir (name) {
-  return `./${name}`
+  return `/home/${ENV}/${name}`
 }
 
 function mongo (name) {
