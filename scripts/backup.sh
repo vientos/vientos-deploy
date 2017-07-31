@@ -3,7 +3,7 @@ DESTINATION=user@host:backups
 CURRENT=$SOURCE/`date -I`
 mkdir $CURRENT
 
-mongodump --db production-service --archive=$CURRENT/service.gz --gzip
-mongodump --db production-idp  --archive=$CURRENT/idp.gz --gzip
+mongodump --db production-service --gzip --archive=$CURRENT/service.gz
+mongodump --db production-idp --gzip --archive=$CURRENT/idp.gz
 
 rsync -a $SOURCE/ $DESTINATION

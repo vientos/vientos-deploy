@@ -70,7 +70,7 @@ module.exports = {
         MONGO_URL: mongo(IDP.NAME),
         COOKIE_PASSWORD: credentials.cookie.idp,
         VIENTOS_IDP_URL: url(IDP.DOMAIN),
-        OAUTH_CLIENT_REDIRECT_PATH: url(SERVICE.DOMAIN) + '/auth/vientos',
+        OAUTH_CLIENT_REDIRECT_URI: url(SERVICE.DOMAIN) + '/auth/vientos',
         VIENTOS_CLIENT_ID: credentials.vientos.clientId,
         VIENTOS_CLIENT_SECRET: credentials.vientos.clientSecret,
         FROM_EMAIL: credentials.vientos.fromEmail,

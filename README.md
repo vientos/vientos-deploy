@@ -30,7 +30,15 @@ ssh-keygen
 2. add public key `.ssh/id_rsa.pub` to `.ssh/authorized_keys` of the account on the server
 you want back up to.
 
-3. create cron job `crontab -e` and setup daily (4am) backups
+### dump
+create cron job `crontab -e` and setup daily (4am) backups
 ```
 0 4 * * * ~/backup.sh
+```
+
+### restore
+one can restore from archive using
+```
+mongorestore --gzip --archive=service.gz
+mongorestore --gzip --archive=idp.gz
 ```
