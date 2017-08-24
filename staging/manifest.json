@@ -1,0 +1,21 @@
+{
+  "name": "Vientos",
+  "short_name": "Vientos",
+  "start_url": "/?homescreen=1",
+  "display": "standalone",
+  "theme_color": "#dce729",
+  "background_color": "#dce729",
+  "icons": [
+    {
+      "src": "images/manifest/staging-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/manifest/staging-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "gcm_sender_id": "67199456673"
+}
