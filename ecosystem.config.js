@@ -83,6 +83,7 @@ module.exports = {
       name: 'webhooks',
       script: './vientos-deploy/webhooks.js',
       env: {
+        NODE_ENV: ENV,
         GIT_REF: `refs/heads/${ENV}`,
         SCRIPTS_PATH: dir(WEBHOOKS.NAME) + '/scripts',
         PORT: WEBHOOKS.PORT,

@@ -1,4 +1,4 @@
 cd $APP_DIR
 git pull --rebase
 npm install && bower install
-npm run bundle
+npm run build
