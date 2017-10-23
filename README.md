@@ -19,6 +19,40 @@ for Debian 8 (Jessie)
 * Sentry - https://sentry.io
 * Github - https://github.com
 
+## Nginx
+
+Included in this repo `nginx.conf` provides a template which one can use for *production* and *staging* deployments
+* [x] listens on IPv4 and IPv6 interfaces
+* [x] uses HTTP/2
+* [x] enables gzip compression
+* [x] uses *Let's Encrypt* certificates *(more detais in next section)*
+* [x] redirects HTTP to HTTPS
+* [x] servers `index.html` for app if requested path doesn't exist
+* [x] disables buffering on data service *(needed for Server Sent Events to work)*
+* [ ] sets max body size
+
+## TLS
+
+### Certbot
+
+To install latest version, follow [official instructions](https://certbot.eff.org/#pip-other) *(just the install part)*
+
+You will also need latest `libssl-dev` you can find the latest version with
+```bash
+apt-cache show libssl-dev
+```
+and then install it with *(adjusting the version number)*
+ ```bash
+ apt install libssl-dev=1.0.2l-1~bpo8+1
+ ```
+
+### autorenew
+[Let's Encrypt](http://letsencrypt.org/) setup follows one in [officia Nginx post](https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/)
+
+create cron job `crontab -e` and setup daily (2am) autorenewal
+```
+0 2 * * * ~/bin/certbot-auto renew --nginx --no-self-upgrade --quiet
+```
 ## Backups
 
 ### SSH setup
