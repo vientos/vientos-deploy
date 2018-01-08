@@ -31,6 +31,18 @@ Included in this repo `nginx.conf` provides a template which one can use for *pr
 * [x] disables buffering on data service *(needed for Server Sent Events to work)*
 * [ ] sets max body size
 
+## MongoDB
+
+Enable auto-starting
+```shell
+systemctl enable mongod
+```
+
+you can verify it with
+```shell
+systemctl list-unit-files | grep mongo
+```
+
 ## TLS
 
 ### Certbot
