@@ -1,0 +1,86 @@
+---
+- name: deploy
+  hosts: all
+  remote_user: "{{ user }}"
+  gather_facts: no
+  tasks:
+    - name: clone repo
+      git:
+        repo: "https://github.com/vientos/vientos-{{ item.name }}.git"
+        dest: "/home/{{ user }}/{{ item.name }}"
+        version: "{{ common.env }}"
+      when: item.domain is defined
+      loop:
+        - "{{ app }}"
+        - "{{ service }}"
+        - "{{ idp }}"
+        - "{{ webhooks }}"
+    - name: npm install
+      npm:
+        path: "/home/{{ user }}/{{ item.name }}"
+      when: item.domain is defined
+      loop:
+        - "{{ app }}"
+        - "{{ service }}"
+        - "{{ idp }}"
+        - "{{ webhooks }}"
+
+    - name: bootstrap app
+      block:
+        - name: create app config
+          template:
+            src: app-config.json.j2
+            dest: "/home/{{ user }}/{{ app.name }}/config.json"
+        - name: install app bower dependencies
+          shell: "NODE_ENV={{ common.env }} ./node_modules/.bin/bower install"
+          args:
+            chdir: "/home/{{ user }}/{{ app.name }}"
+        - name: run webpack build
+          shell: "NODE_ENV={{ common.env }} npm run build"
+          args:
+            chdir: "/home/{{ user }}/{{ app.name }}"
+      when: app.domain is defined
+
+# https://www.brendanlong.com/systemd-user-services-are-amazing.html
+    - name: create directory for user services
+      file:
+        path: "/home/{{ user }}/.config/systemd/user"
+        state: "directory"
+
+    - name: Register uid of user
+      command: "id -u {{ user }}"
+      register: user_uid
+
+    - name: copy units from templates
+      template:
+        src: "systemd/{{ item.name }}.service.j2"
+        dest: "/home/{{ user }}/.config/systemd/user/vientos-{{ item.name }}.service"
+      when: item.domain is defined
+      loop:
+        - "{{ service }}"
+        - "{{ idp }}"
+        - "{{ webhooks }}"
+    - name: enable and start services
+      systemd:
+        name: "vientos-{{ item.name }}"
+        enabled: yes
+        state: restarted
+        user: yes
+        daemon_reload: yes
+      environment:
+        XDG_RUNTIME_DIR: "/run/user/{{user_uid.stdout}}"
+      when: item.domain is defined
+      loop:
+        - "{{ service }}"
+        - "{{ idp }}"
+        - "{{ webhooks }}"
+        
+- name: restart nginx
+  hosts: all
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted

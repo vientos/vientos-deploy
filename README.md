@@ -1,16 +1,151 @@
 # vientos-deploy
 
-for Debian 8 (Jessie)
+[Ansible](https://docs.ansible.com/ansible) playbook to deploy vientos stack
 
-## dependencies
+It assumes Ubuntu 18.04TLS, playbook tested to work in [LXD](https://linuxcontainers.org/lxd/introduction/) containers
 
-* MongoDB - https://docs.mongodb.com/manual/tutorial/install-mongodb-on-debian/
-* Nginx - https://www.linuxbabe.com/nginx/enable-http2-debian-8-nginx-web-server
-  * HTTP/2 ALPN - https://sergii.rocks/feed/post/nginx-http2-with-alpn-on-debian-8-jessie
-* Certbot - https://certbot.eff.org/#debianjessie-nginx
-* NVM - https://github.com/creationix/nvm#installation
+## Usage
 
-## 3rd party services
+### configure
+
+#### hosts.yml
+
+Firs of all add entry to `inventory/hosts.yml` following other existin entries and [ansible inventory documentation](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) eg.
+
+```yaml
+mx:
+  children:
+    mx-staging:
+      hosts:
+        staging.vientos.coop:
+          ansible_host: 136.243.86.184
+          ansible_port: 2222
+          ansible_python_interpreter: /usr/bin/python3
+```
+
+#### group_vars
+
+Add configuration specific to the group of hosts you maintain to `inventory/group_vars/` eg.
+
+`inventory.group_vars/mx.yml`
+```yaml
+---
+ssh_key_urls:
+  - https://github.com/elf-pavlik.keys
+language: es
+country: mx
+map:
+  latitude: 19.43
+  longitude: -99.13
+  zoom: 9
+  tilelayer: "https://api.mapbox.com/styles/v1/vientos/cixqjuql4002y2rrsrjy004fg/tiles/256/{z}/{x}/{y}@2x?access_token=
+```
+
+#### host_vars
+
+Configuration specific to each host goes to `inventory/host_vars/`, you need to create a directory for each host with two files in it `config.yml` and `secrets.yml` (this one stays git ignored!) eg.
+
+`inventory/host_vars/staging.vientos.coop/config.yml`
+```yaml
+---
+common:
+  env: staging
+
+app:
+  name: app
+  domain: staging.vientos.coop
+
+service:
+  name: service
+  domain: data.staging.vientos.coop
+  port: 8000
+
+idp:
+  name: idp
+  domain: idp.staging.vientos.coop
+  port: 8001
+
+webhooks:
+  name: webhooks
+  domain: webhooks.staging.vientos.coop
+  port: 8002
+```
+
+To disable any of the services simply leave its `domain` undefined eg.
+
+```
+common:
+  env: staging
+
+app:
+  name: app
+
+service:
+  name: service
+  domain: data.staging.vientos.coop
+  port: 8000
+
+idp:
+  name: idp
+
+webhooks:
+  name: webhooks
+```
+
+`inventory/host_vars/staging.vientos.coop/secrets.yml`
+```yaml
+---
+secrets:
+  common:
+    letsencryptEmail: # email used to agree to Let's encrypt Terms of Service
+    fromEmail: # email used as *From* in emails sent by service and idp
+    mailjet:
+      public: # get it from
+      secret: # get it from 
+
+  app:
+    sentry: # get it from https://sentry.io/settings/
+    google:
+        apiKey: # get it from https://console.developers.google.com
+    cloudinary:
+      cloud: # get it from https://cloudinary.com/console
+      preset: # get it from https://cloudinary.com/console/settings/upload
+
+  service:
+    cookie: # generate eg. openssl rand -base64 32
+    sentry: # get it from https://sentry.io/settings/
+    google:
+      clientId: # get it from https://console.developers.google.com
+      clientSecret: # get it from https://console.developers.google.com
+      gcmApiKey: # get it from https://console.developers.google.com
+    facebook:
+      clientId: # get it from https://developers.facebook.com/
+      clientSecret: # get it from https://developers.facebook.com/
+
+  idp:
+    cookie: # generate eg. openssl rand -base64 32
+    sentry: # get it from https://sentry.io/settings/
+    clientId: # choose one eg. staging-idp
+    clientSecret: # generate eg. openssl rand -base64 32
+
+  webhooks:
+    secret: # set in https://github.com/vientos/{repo}/settings/hooks
+
+```
+
+### run
+
+`ansible-playbook site.yml`
+
+#### test run
+
+For testing purposes Let's Encrypt provides a staging environemnt
+
+`ansible-playbook site.yml --extra-vars "letsencrypt_staging=yes"`
+
+## Details
+
+### 3rd party services
 
 * Cloudinary - http://cloudinary.com
 * Google - https://console.developers.google.com
@@ -19,70 +154,31 @@ for Debian 8 (Jessie)
 * Sentry - https://sentry.io
 * Github - https://github.com
 
-## Nginx
+### Nginx
 
 Included in this repo `nginx.conf` provides a template which one can use for *production* and *staging* deployments
 * [x] listens on IPv4 and IPv6 interfaces
 * [x] uses HTTP/2
 * [x] enables gzip compression
-* [x] uses *Let's Encrypt* certificates *(more detais in next section)*
+* [x] uses *Let's Encrypt* certificates
 * [x] redirects HTTP to HTTPS
 * [x] servers `index.html` for app if requested path doesn't exist
 * [x] disables buffering on data service *(needed for Server Sent Events to work)*
 * [ ] sets max body size
 
-## MongoDB
+### Backups
 
-Enable auto-starting
-```shell
-systemctl enable mongod
-```
+#### SSH setup
 
-you can verify it with
-```shell
-systemctl list-unit-files | grep mongo
-```
+add public key of unprivileged user `.ssh/id_rsa.pub` to `.ssh/authorized_keys` of the account on the server you want back up to.
 
-## TLS
-
-### Certbot
-
-To install latest version, follow [official instructions](https://certbot.eff.org/#pip-other) *(just the install part)*
-
-You will also need latest `libssl-dev` you can find the latest version with
-```bash
-apt-cache show libssl-dev
-```
-and then install it with *(adjusting the version number)*
- ```bash
- apt install libssl-dev=1.0.2l-1~bpo8+1
- ```
-
-### autorenew
-[Let's Encrypt](http://letsencrypt.org/) setup follows one in [officia Nginx post](https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/)
-
-create cron job `crontab -e` and setup daily (2am) autorenewal
-```
-0 2 * * * ~/bin/certbot-auto renew --nginx --no-self-upgrade --quiet
-```
-## Backups
-
-### SSH setup
-
-1. generate ssh keys on the server you deploy to
-```bash
-ssh-keygen
-```
-2. add public key `.ssh/id_rsa.pub` to `.ssh/authorized_keys` of the account on the server
-you want back up to.
-
-### dump
+#### dump
 create cron job `crontab -e` and setup daily (4am) backups
 ```
 0 4 * * * ~/backup.sh
 ```
 
-### restore
+#### restore
 one can restore from archive using
 ```
 mongorestore --gzip --archive=service.gz

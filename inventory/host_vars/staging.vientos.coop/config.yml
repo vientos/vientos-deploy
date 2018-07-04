@@ -1,0 +1,22 @@
+---
+common:
+  env: staging
+
+app:
+  name: app
+  domain: dev.vientos.coop
+
+service:
+  name: service
+  domain: data.dev.vientos.coop
+  port: 8000
+
+idp:
+  name: idp
+  domain: idp.dev.vientos.coop
+  port: 8001
+
+webhooks:
+  name: webhooks
+  domain: webhooks.dev.vientos.coop
+  port: 8002

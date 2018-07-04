@@ -1,0 +1,10 @@
+---
+ssh_key_urls:
+  - https://github.com/elf-pavlik.keys
+language: es
+country: mx
+map:
+  latitude: 19.43
+  longitude: -99.13
+  zoom: 9
+  tilelayer: "https://api.mapbox.com/styles/v1/vientos/cixqjuql4002y2rrsrjy004fg/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoidmllbnRvcyIsImEiOiJjaXdwZG5iN3kwMDRxMnRsaHJkNzQxZGVmIn0.TvQBDcF8tKU2wmqsEHVzNA"

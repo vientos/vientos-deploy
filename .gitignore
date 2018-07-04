@@ -1,3 +1,2 @@
-node_modules
-env
-credentials.json
+inventory/host_vars/*/secrets.yml
+**/*.retry

@@ -1,0 +1,17 @@
+{
+  "language": "{{ language }}",
+  "country": "{{ country }}",
+  "service": "https://{{ service.domain }}",
+  "map": {
+    "latitude": "{{ map.latitude }}",
+    "longitude": "{{ map.longitude }}",
+    "zoom": "{{ map.zoom }}",
+    "tilelayer": "{{ map.tilelayer }}",
+    "googleApiKey": "{{ secrets.app.google.apiKey }}"
+  },
+  "cloudinary": {
+    "cloud": "{{ secrets.app.cloudinary.cloud }}",
+    "preset": "{{ secrets.app.cloudinary.preset }}"
+  },
+  "sentry": "{{ secrets.app.sentry }}"
+}

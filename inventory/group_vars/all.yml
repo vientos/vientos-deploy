@@ -1,0 +1,6 @@
+---
+
+user: vientos
+mongo_prefix: mongodb://localhost:27017/
+
+client_redirect_path: /auth/vientos

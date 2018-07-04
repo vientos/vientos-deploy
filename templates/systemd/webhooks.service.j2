@@ -1,0 +1,19 @@
+[Unit]
+Description=Vientos service which handles github webhooks
+After=network.target
+
+[Service]
+Type=simple
+Environment=NODE_ENV={{ common.env }}
+Environment=PORT={{ webhooks.port }}
+Environment=GIT_REF=refs/heads/{{ common.env }}
+Environment=WEBHOOKS_SECRET={{ secrets.webhooks.secret }}
+Environment=SCRIPTS_PATH=/home/{{ user }}/update-scripts
+
+ExecStart=/usr/bin/node /home/{{ user }}/webhooks/server.js
+Restart=always
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

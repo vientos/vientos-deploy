@@ -1,0 +1,28 @@
+[Unit]
+Description=Vientos identity provider service
+After=network.target
+
+[Service]
+Type=simple
+Environment=NODE_ENV={{ common.env }}
+Environment=PORT={{ idp.port }}
+Environment=MONGO_URL={{ mongo_prefix }}idp
+Environment=COOKIE_PASSWORD={{ secrets.service.cookie }}
+Environment=IDP_URL=https://{{ idp.domain }}
+Environment=IDP_CLIENT_ID={{ secrets.idp.clientId }}
+Environment=IDP_CLIENT_SECRET={{ secrets.idp.clientSecret }}
+Environment=IDP_CLIENT_REDIRECT_URL=https://{{ service.domain }}{{ client_redirect_path}}
+Environment=FROM_EMAIL={{ secrets.common.fromEmail }}
+Environment=MAILJET_APIKEY_PUBLIC={{ secrets.common.mailjet.public }}
+Environment=MAILJET_APIKEY_SECRET={{ secrets.common.mailjet.secret }}
+{% if secrets.service.sentry is defined %}
+  Environment=SENTRY_DSN={{ secrets.service.sentry }}
+{% endif %}
+
+ExecStart=/usr/bin/node /home/{{ user }}/idp/src/server.js
+Restart=always
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

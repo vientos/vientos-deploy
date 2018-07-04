@@ -1,0 +1,143 @@
+---
+- name: provision
+  hosts: all
+  remote_user: root
+  gather_facts: no
+  tasks:
+    - name: add certbot ppa
+      apt_repository:
+        repo: 'ppa:certbot/certbot'
+        state: present
+
+    - name: install certbot packages
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - letsencrypt
+          - python-certbot-nginx
+
+    # install services
+    - name: install services packages
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - nginx
+          - mongodb
+
+    # https://github.com/nodesource/distributions#manual-installation
+    # TODO: contribute to https://github.com/nodesource/ansible-nodejs-role
+    - name: Add the NodeSource package signing key
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+    - name: Add the desired NodeSource repository
+      apt_repository:
+        repo: "{{ item }}"
+        state: present
+      loop:
+       - deb https://deb.nodesource.com/node_8.x bionic main
+       - deb-src https://deb.nodesource.com/node_8.x bionic main
+    - name: Update package lists and install Node.js
+      apt:
+        name: nodejs
+        state: present
+        update_cache: yes
+
+    # setup unprivileged user
+    - name: create user
+      user:
+        name: "{{ user }}"
+        shell: /bin/bash
+        generate_ssh_key: yes
+        ssh_key_bits: 2048
+        ssh_key_file: .ssh/id_rsa
+
+    - name: add ssh keys
+      authorized_key:
+        user: "{{ user }}"
+        key: "{{ item }}"
+      loop: "{{ ssh_key_urls }}"
+
+    - name: enable running services while not logged in
+      command: "loginctl enable-linger {{ user }}"
+
+    - name: create logs directory
+      file:
+        path: "/home/{{ user }}/logs"
+        state: "directory"
+        owner: "{{ user }}"
+        group: "{{ user }}"
+
+    # https://mozilla.github.io/server-side-tls/ssl-config-generator/
+    # or https://gist.github.com/cecilemuller/a26737699a7e70a7093d4dc115915de8
+    - name: copy nginx common options
+      copy:
+        src: common.conf
+        dest: /etc/nginx
+
+    - name: copy nginx blocks
+      template:
+        src: "nginx/{{ item.name }}.conf.j2"
+        dest: "/etc/nginx/sites-available/{{ item.name }}.conf"
+      when: item.domain is defined
+      loop:
+        - "{{ app }}"
+        - "{{ service }}"
+        - "{{ idp }}"
+        - "{{ webhooks }}"
+
+    - name: enable enginx blocks
+      file:
+        src: "/etc/nginx/sites-available/{{ item.name }}.conf"
+        dest: "/etc/nginx/sites-enabled/{{ item.name }}.conf"
+        state: link
+      when: item.domain is defined
+      loop:
+        - "{{ app }}"
+        - "{{ service }}"
+        - "{{ idp }}"
+        - "{{ webhooks }}"
+
+    # certificates with let's encrypt
+    - name: generate certificates
+      include_role:
+        name: certbot-standalone
+      vars:
+        domain: "{{ item.domain }}"
+      when: item.domain is defined
+      loop:
+        - "{{ app }}"
+        - "{{ service }}"
+        - "{{ idp }}"
+        - "{{ webhooks }}"
+
+    - name: add cert paths to nginx blocks
+      blockinfile:
+        path: "/etc/nginx/sites-available/{{ item.name }}.conf"
+        marker: "# {mark} ANSIBLE MANAGED TLS BLOCK"
+        insertbefore: "^}"
+        block: |
+          ssl_certificate /etc/letsencrypt/live/{{ item.domain }}/fullchain.pem;
+          ssl_certificate_key /etc/letsencrypt/live/{{ item.domain }}/privkey.pem;
+      when: item.domain is defined
+      loop:
+        - "{{ app }}"
+        - "{{ service }}"
+        - "{{ idp }}"
+        - "{{ webhooks }}"
+
+    - name: add root to app nginx block
+      blockinfile:
+        path: "/etc/nginx/sites-available/{{ app.name }}.conf"
+        marker: "# {mark} ANSIBLE MANAGED root BLOCK"
+        insertbefore: "^}"
+        block: |
+          root /home/{{ user }}/vientos-app/dist;
+          index index.html;
+      when: app.domain is defined

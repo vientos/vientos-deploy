@@ -1,0 +1,44 @@
+[Unit]
+Description=Vientos service providing interface to dataset
+After=network.target
+
+[Service]
+Type=simple
+Environment=NODE_ENV={{ common.env }}
+Environment=PORT={{ service.port }}
+Environment=MONGO_URL={{ mongo_prefix }}service
+Environment=SERVICE_URL=https://{{ service.domain }}
+Environment=APP_URL=https://{{ app.domain }}
+Environment=VIENTOS_LANGUAGE={{ language }}
+Environment=COOKIE_PASSWORD={{ secrets.service.cookie }}
+{% if secrets.service.sentry is defined %}
+  Environment=SENTRY_DSN={{ secrets.service.sentry }}
+{% endif %}
+{% if secrets.service.google.gcmApiKey is defined %}
+  Environment=GCM_API_KEY={{ secrets.service.google.gcmApiKey }}
+{% endif %}
+{% if secrets.idp.domain is defined
+   and secrets.idp.clientId is defined
+   and secrets.idp.clientSecret is defined %}
+  Environment=IDP_URL=https://{{ secrets.idp.domain }}
+  Environment=IDP_CLIENT_ID={{ secrets.idp.clientId }}
+  Environment=IDP_CLIENT_SECRET={{ secrets.idp.clientSecret }}
+{% endif %}
+{% if secrets.service.google.clientId is defined 
+   and secrets.service.google.slientSecret is defined %}
+  Environment=GOOGLE_CLIENT_ID={{ secrets.service.google.clientId }}
+  Environment=GOOGLE_CLIENT_SECRET={{ secrets.service.google.clientSecret }}
+{% endif %}
+{% if secrets.service.facebook.clientId is defined 
+   and secrets.service.facebook.slientSecret is defined %}
+  Environment=FACEBOOK_CLIENT_ID={{ secrets.service.facebook.clientId }}
+  Environment=FACEBOOK_CLIENT_SECRET={{ secrets.service.facebook.clientSecret }}
+{% endif %}
+
+ExecStart=/usr/bin/node /home/{{ user }}/service/src/server.js
+Restart=always
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target
