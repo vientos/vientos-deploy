@@ -73,7 +73,7 @@ webhooks:
 
 To disable any of the services simply leave its `domain` undefined eg.
 
-```
+```yaml
 common:
   env: staging
 
@@ -100,8 +100,8 @@ secrets:
     letsencryptEmail: # email used to agree to Let's encrypt Terms of Service
     fromEmail: # email used as *From* in emails sent by service and idp
     mailjet:
-      public: # get it from
-      secret: # get it from 
+      public: # get it from https://app.mailjet.com/account/api_keys
+      secret: # get it from https://app.mailjet.com/account/api_keys
 
   app:
     sentry: # get it from https://sentry.io/settings/
@@ -156,7 +156,7 @@ For testing purposes Let's Encrypt provides a staging environemnt
 
 ### Nginx
 
-Included in this repo `nginx.conf` provides a template which one can use for *production* and *staging* deployments
+Included nginx blocks configuration includes
 * [x] listens on IPv4 and IPv6 interfaces
 * [x] uses HTTP/2
 * [x] enables gzip compression
@@ -164,23 +164,4 @@ Included in this repo `nginx.conf` provides a template which one can use for *pr
 * [x] redirects HTTP to HTTPS
 * [x] servers `index.html` for app if requested path doesn't exist
 * [x] disables buffering on data service *(needed for Server Sent Events to work)*
-* [ ] sets max body size
-
-### Backups
-
-#### SSH setup
-
-add public key of unprivileged user `.ssh/id_rsa.pub` to `.ssh/authorized_keys` of the account on the server you want back up to.
-
-#### dump
-create cron job `crontab -e` and setup daily (4am) backups
-```
-0 4 * * * ~/backup.sh
-```
-
-#### restore
-one can restore from archive using
-```
-mongorestore --gzip --archive=service.gz
-mongorestore --gzip --archive=idp.gz
-```
+* [x] sets max body size

@@ -138,6 +138,6 @@
         marker: "# {mark} ANSIBLE MANAGED root BLOCK"
         insertbefore: "^}"
         block: |
-          root /home/{{ user }}/vientos-app/dist;
+          root /home/{{ user }}/app/dist;
           index index.html;
       when: app.domain is defined
