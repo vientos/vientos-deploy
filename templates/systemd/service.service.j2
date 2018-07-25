@@ -17,20 +17,20 @@ Environment=COOKIE_PASSWORD={{ secrets.service.cookie }}
 {% if secrets.service.google.gcmApiKey is defined %}
   Environment=GCM_API_KEY={{ secrets.service.google.gcmApiKey }}
 {% endif %}
-{% if secrets.idp.domain is defined
+{% if idp.domain is defined
    and secrets.idp.clientId is defined
    and secrets.idp.clientSecret is defined %}
-  Environment=IDP_URL=https://{{ secrets.idp.domain }}
+  Environment=IDP_URL=https://{{ idp.domain }}
   Environment=IDP_CLIENT_ID={{ secrets.idp.clientId }}
   Environment=IDP_CLIENT_SECRET={{ secrets.idp.clientSecret }}
 {% endif %}
 {% if secrets.service.google.clientId is defined 
-   and secrets.service.google.slientSecret is defined %}
+   and secrets.service.google.clientSecret is defined %}
   Environment=GOOGLE_CLIENT_ID={{ secrets.service.google.clientId }}
   Environment=GOOGLE_CLIENT_SECRET={{ secrets.service.google.clientSecret }}
 {% endif %}
 {% if secrets.service.facebook.clientId is defined 
-   and secrets.service.facebook.slientSecret is defined %}
+   and secrets.service.facebook.clientSecret is defined %}
   Environment=FACEBOOK_CLIENT_ID={{ secrets.service.facebook.clientId }}
   Environment=FACEBOOK_CLIENT_SECRET={{ secrets.service.facebook.clientSecret }}
 {% endif %}
