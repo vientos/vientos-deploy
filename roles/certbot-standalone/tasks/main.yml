@@ -5,5 +5,5 @@
    register: live_cert
 
  - name: Generate new certificate if one doesn't exist
-   shell: "certbot certonly --nginx --email {{ secrets.common.letsencryptEmail }} --agree-tos -d {{ domain }} {% if letsencrypt_staging %} --staging {% endif %}"
+   shell: "certbot certonly --nginx --non-interactive --agree-tos --email {{ secrets.common.letsencryptEmail }} -d {{ domain }} {% if alternative_domain is defined %} -d {{ alternative_domain }} {% endif %} {% if letsencrypt_staging %} --staging {% endif %}"
    when: not live_cert.stat.exists

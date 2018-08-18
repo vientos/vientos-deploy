@@ -87,6 +87,7 @@
         dest: "/etc/nginx/sites-available/{{ item.name }}.conf"
       when: item.domain is defined
       loop:
+        - "{{ website }}"
         - "{{ app }}"
         - "{{ service }}"
         - "{{ idp }}"
@@ -99,6 +100,7 @@
         state: link
       when: item.domain is defined
       loop:
+        - "{{ website }}"
         - "{{ app }}"
         - "{{ service }}"
         - "{{ idp }}"
@@ -110,8 +112,10 @@
         name: certbot-standalone
       vars:
         domain: "{{ item.domain }}"
+        alternative_domain: "{{ item.alternative_domain }}"
       when: item.domain is defined
       loop:
+        - "{{ website }}"
         - "{{ app }}"
         - "{{ service }}"
         - "{{ idp }}"
@@ -127,6 +131,7 @@
           ssl_certificate_key /etc/letsencrypt/live/{{ item.domain }}/privkey.pem;
       when: item.domain is defined
       loop:
+        - "{{ website }}"
         - "{{ app }}"
         - "{{ service }}"
         - "{{ idp }}"
@@ -138,6 +143,16 @@
         marker: "# {mark} ANSIBLE MANAGED root BLOCK"
         insertbefore: "^}"
         block: |
-          root /home/{{ user }}/app/dist;
+          root /home/{{ user }}/{{ app.name }}/dist;
           index index.html;
       when: app.domain is defined
+
+    - name: add root to website nginx block
+      blockinfile:
+        path: "/etc/nginx/sites-available/{{ website.name }}.conf"
+        marker: "# {mark} ANSIBLE MANAGED root BLOCK"
+        insertbefore: "^}"
+        block: |
+          root /home/{{ user }}/{{ website.name }};
+          index index.html;
+      when: website.domain is defined

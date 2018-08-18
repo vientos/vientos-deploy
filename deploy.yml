@@ -11,10 +11,12 @@
         version: "{{ common.env }}"
       when: item.domain is defined
       loop:
+        - "{{ website }}"
         - "{{ app }}"
         - "{{ service }}"
         - "{{ idp }}"
         - "{{ webhooks }}"
+
     - name: npm install
       npm:
         path: "/home/{{ user }}/{{ item.name }}"

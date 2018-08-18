@@ -51,9 +51,14 @@ Configuration specific to each host goes to `inventory/host_vars/`, you need to 
 common:
   env: staging
 
+website:
+  name: website
+  domain: staging.vientos.coop
+  alternative_domain: www.staging.vientos.coop
+
 app:
   name: app
-  domain: staging.vientos.coop
+  domain: app.staging.vientos.coop
 
 service:
   name: service
@@ -76,6 +81,9 @@ To disable any of the services simply leave its `domain` undefined eg.
 ```yaml
 common:
   env: staging
+
+website:
+  name: website
 
 app:
   name: app

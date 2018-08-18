@@ -2,6 +2,11 @@
 common:
   env: staging
 
+website:
+  name: website
+  domain: staging.vientos.coop
+  alternative_domain: www.staging.vientos.coop
+
 app:
   name: app
   domain: app.staging.vientos.coop

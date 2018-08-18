@@ -2,6 +2,11 @@
 common:
   env: production
 
+website:
+  name: website
+  domain: vientos.coop
+  alternative_domain: www.vientos.coop
+
 app:
   name: app
   domain: app.vientos.coop
