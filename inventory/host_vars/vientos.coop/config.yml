@@ -1,0 +1,20 @@
+---
+common:
+  env: production
+
+app:
+  name: app
+  domain: app.vientos.coop
+
+service:
+  name: service
+  domain: data.vientos.coop
+  port: 8000
+
+idp:
+  name: idp
+  domain: idp.vientos.coop
+  port: 8001
+
+webhooks:
+  name: webhooks

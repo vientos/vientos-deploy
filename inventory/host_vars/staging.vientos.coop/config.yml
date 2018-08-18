@@ -4,19 +4,19 @@ common:
 
 app:
   name: app
-  domain: dev.vientos.coop
+  domain: app.staging.vientos.coop
 
 service:
   name: service
-  domain: data.dev.vientos.coop
+  domain: data.staging.vientos.coop
   port: 8000
 
 idp:
   name: idp
-  domain: idp.dev.vientos.coop
+  domain: idp.staging.vientos.coop
   port: 8001
 
 webhooks:
   name: webhooks
-  domain: webhooks.dev.vientos.coop
+  domain: webhooks.staging.vientos.coop
   port: 8002
