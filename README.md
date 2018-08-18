@@ -165,3 +165,39 @@ Included nginx blocks configuration includes
 * [x] servers `index.html` for app if requested path doesn't exist
 * [x] disables buffering on data service *(needed for Server Sent Events to work)*
 * [x] sets max body size
+
+
+### LXD host
+
+Setup follows: https://www.digitalocean.com/community/tutorials/how-to-host-multiple-web-sites-with-nginx-and-haproxy-using-lxd-on-ubuntu-16-04
+
+
+#### iptables
+
+We need to forward ports `80` and `443` to haproxy container
+```shell
+sudo iptables -A PREROUTING -t nat -i your_network_dev -p tcp --dport 80 -j DNAT --to-destination your_haproxy_ip:80
+sudo iptables -A PREROUTING -t nat -i your_network_dev -p tcp --dport 443 -j DNAT --to-destination your_haproxy_ip:443
+```
+
+As well as map custom SSH ports to coresponding containers
+```shell
+sudo iptables -A PREROUTING -t nat -i your_network_dev -p tcp --dport your_custom_ssh_port -j DNAT --to your_container_ip:22
+sudo iptables -A FORWARD -p tcp -d your_container_ip --dport 22 -j ACCEPT
+```
+
+To remove those mappings simply replace `iptables -A` with `iptables -D`
+
+Make sure you make those rules persistent
+```shell
+sudo apt-get install iptables-persistent
+```
+
+every time you change them
+```shell
+sudo netfilter-persistent save
+```
+
+#### ssh
+
+You can import SSH keys from github using [ssh-import-id](https://github.com/dustinkirkland/ssh-import-id)
