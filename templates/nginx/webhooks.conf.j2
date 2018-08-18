@@ -4,8 +4,6 @@ server
   listen [::]:443 ssl http2;
   server_name {{ webhooks.domain }};
 
-  include /etc/nginx/common.conf;
-
   access_log /home/{{ user }}/logs/webhooks-access.log;
   error_log /home/{{ user }}/logs/webhooks-error.log;
 

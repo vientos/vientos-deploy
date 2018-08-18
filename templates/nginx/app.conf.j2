@@ -11,8 +11,6 @@ server
     return 301 https://$host$request_uri;
   }
 
-  include /etc/nginx/common.conf;
-
   access_log /home/{{ user }}/logs/app-access.log;
   error_log /home/{{ user }}/logs/app-error.log;
 

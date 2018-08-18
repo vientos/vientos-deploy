@@ -76,9 +76,9 @@
 
     # https://mozilla.github.io/server-side-tls/ssl-config-generator/
     # or https://gist.github.com/cecilemuller/a26737699a7e70a7093d4dc115915de8
-    - name: copy nginx common options
+    - name: copy nginx config
       copy:
-        src: common.conf
+        src: nginx.conf
         dest: /etc/nginx
 
     - name: copy nginx blocks
