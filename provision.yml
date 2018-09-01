@@ -67,6 +67,13 @@
     - name: enable running services while not logged in
       command: "loginctl enable-linger {{ user }}"
 
+    - name: customize .bashrc
+      blockinfile:
+        path: "/home/{{ user }}/.bashrc"
+        block: |
+          export PATH=/home/{{ user }}/bin:$PATH
+          export XDG_RUNTIME_DIR=/run/user/$UID
+
     - name: create logs directory
       file:
         path: "/home/{{ user }}/logs"

@@ -1,4 +1,5 @@
-cd /home/{{ user }}/vientos-app
+#!/bin/bash
+cd /home/{{ user }}/{{ item.name }}
 git pull --rebase
 npm install && bower install
 npm run build

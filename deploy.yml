@@ -76,6 +76,24 @@
         - "{{ service }}"
         - "{{ idp }}"
         - "{{ webhooks }}"
+
+    - name: create directory for update scripts
+      file:
+        path: "/home/{{ user }}/bin"
+        state: directory
+
+    - name: copy update scripts
+      template:
+        src: "scripts/update-{{ item.name }}.sh.j2"
+        dest: "/home/{{ user }}/bin/update-{{ item.name }}"
+        mode: 744
+      when: item.domain is defined
+      loop:
+        - "{{ website }}"
+        - "{{ app }}"
+        - "{{ service }}"
+        - "{{ idp }}"
+
         
 - name: restart nginx
   hosts: all
