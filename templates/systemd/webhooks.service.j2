@@ -8,7 +8,7 @@ Environment=NODE_ENV={{ common.env }}
 Environment=PORT={{ webhooks.port }}
 Environment=GIT_REF=refs/heads/{{ common.env }}
 Environment=WEBHOOKS_SECRET={{ secrets.webhooks.secret }}
-Environment=SCRIPTS_PATH=/home/{{ user }}/update-scripts
+Environment=SCRIPTS_PATH=/home/{{ user }}/bin
 
 ExecStart=/usr/bin/node /home/{{ user }}/webhooks/server.js
 Restart=always

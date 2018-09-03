@@ -1,0 +1,5 @@
+#!/bin/bash
+cd /home/{{ user }}/{{ item.name }}
+git pull --rebase
+npm install
+systemctl --user restart vientos-webhooks
