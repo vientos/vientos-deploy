@@ -174,11 +174,32 @@ Included nginx blocks configuration includes
 * [x] disables buffering on data service *(needed for Server Sent Events to work)*
 * [x] sets max body size
 
+### systemd & journald
+
+Systemd manages deployed serivces as user units, `systemctl --user` provides interface to them e.g.
+```bash
+systemctl --user status vientos-service
+```
+In similar way `journalctl --user` provides interface to see logs of those services e.g.
+```bash
+journalctl --user -u vientos-service
+```
+Commands above should get executed as unpriviledged user, by default `vientos`.
 
 ### LXD host
 
 Setup follows: https://www.digitalocean.com/community/tutorials/how-to-host-multiple-web-sites-with-nginx-and-haproxy-using-lxd-on-ubuntu-16-04
 
+
+#### ZFS configuration
+
+Required for `journalctl --user` to work, if you have ZFS filesystem for `staging` container in `default` pool
+
+```shell
+sudo zfs set acltype=posixacl default/containers/staging
+sudo zfs set xattr=sa default/containers/staging
+```
+Otherwise `journalctl --user` results in error `Failed to search journal ACL: Operation not supported`
 
 #### iptables
 
