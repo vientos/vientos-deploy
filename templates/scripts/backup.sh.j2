@@ -1,0 +1,14 @@
+SOURCE=~/backups
+DESTINATION={{ common.backups.destination }}
+CURRENT=$SOURCE/`date -I`
+mkdir $CURRENT
+
+{% if service.domain is defined %}
+  mongodump --db service --gzip --archive=$CURRENT/service.gz
+{% endif %}
+
+{% if idp.domain is defined %}
+  mongodump --db idp --gzip --archive=$CURRENT/idp.gz
+{% endif %}
+
+rsync -a $SOURCE/ $DESTINATION

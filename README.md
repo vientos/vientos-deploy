@@ -50,6 +50,8 @@ Configuration specific to each host goes to `inventory/host_vars/`, you need to 
 ---
 common:
   env: staging
+  backups:
+    destination: user@domain.tld:backups
 
 website:
   name: website
@@ -185,6 +187,20 @@ In similar way `journalctl --user` provides interface to see logs of those servi
 journalctl --user -u vientos-service
 ```
 Commands above should get executed as unpriviledged user, by default `vientos`.
+
+
+### backups
+
+If you specified destination for backups in the `config.yaml` of particular host
+(e.g `backups.destination: user@domain.tld:backups`) it will install a cron job
+which daily runs backup script which does following steps:
+1. dumps compressed mongo databases to `~/backups`
+2. rsyncs `~/backups` to specified destination
+
+It will use ssh key generated for unpriviledged user (`vientos` by default).
+To to bootstrap authentication manually do following steps:
+1. append content of `/home/vientos/.ssh/id_rsa.pub` to `~/.ssh/authorized_keys` on the destination server
+2. as `vientos` user on deployed host, try ssh to specified destination server and accept adding its key fingreprint to the list of known hosts
 
 ### LXD host
 

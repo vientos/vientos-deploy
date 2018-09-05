@@ -86,7 +86,7 @@
       template:
         src: "scripts/update-{{ item.name }}.sh.j2"
         dest: "/home/{{ user }}/bin/update-{{ item.name }}"
-        mode: 744
+        mode: 0740
       when: item.domain is defined
       loop:
         - "{{ website }}"
@@ -94,7 +94,32 @@
         - "{{ service }}"
         - "{{ idp }}"
         - "{{ webhooks }}"
+      tags:
+        - backups
         
+    - name: create directory for backups
+      file:
+        path: "/home/{{ user }}/backups"
+        state: directory
+      when: common.backups is defined
+
+    - name: copy backups script
+      template:
+        src: "scripts/backup.sh.j2"
+        dest: "/home/{{ user }}/bin/backup"
+        mode: 0740
+      when: common.backups is defined
+      tags:
+        - backups
+
+    - name: add backups cron job
+      cron:
+        name: vientos backups
+        user: "{{ user }}"
+        special_time: daily
+        job: "/home/{{ user }}/bin/backup"
+      when: common.backups is defined
+
 - name: restart nginx
   hosts: all
   remote_user: root

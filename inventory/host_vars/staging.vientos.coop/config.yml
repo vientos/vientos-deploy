@@ -1,6 +1,8 @@
 ---
 common:
   env: staging
+  backups:
+    destination: vientos@floriberto.mayfirst.org:tmp
 
 website:
   name: website
